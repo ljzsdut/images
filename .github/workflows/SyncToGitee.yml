@@ -1,0 +1,27 @@
+name: Sync Github Repos To Gitee
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '*/10 * * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Sync Github Repos To Gitee  # 名字随便起
+      uses: Yikun/hub-mirror-action@v1.2  # 使用Yikun/hub-mirror-action,参考链接：https://jiuaidu.com/jianzhan/960898/
+      with:
+        src: github/ljzsdut # 源端账户名(github)
+        dst: gitee/ljzsdut  # 目的端账户名(gitee)
+        dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}  # SSH密钥对中的私钥，用于github连接gitee
+        dst_token:  ${{ secrets.GITEE_TOKEN }}  # Gitee账户的私人令牌，创建仓库的API tokens， 用于自动创建不存在的仓库
+        account_type: user  # 账户类型，可以设置为org（组织）或者user（用户）
+        clone_style: "https"  # 使用https方式进行clone，也可以使用ssh
+        debug: true  # 启用后会显示所有执行命令
+        force_update: true  # 启用后，强制同步，即强制覆盖目的端仓库
+        static_list: "images"  # 静态同步列表，在此填写需要同步的仓库名称，可填写多个
+        mappings: "images=>pic"  #源仓库映射规则，比如'A=>B, C=>CC', A会被映射为B，C会映射为CC，映射不具有传递性。主要用于源和目的仓库名不同的镜像。
+        timeout: '600s'  # git超时设置，超时后会自动重试git操作
